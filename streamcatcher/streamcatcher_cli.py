@@ -7,7 +7,7 @@ import datetime
 import time
 
 APPNAME = "streamcatcher"
-__version__ = "0.0.1"
+__version__ = "0.0.2"
 
 def main():
     if "--version" in sys.argv[1:]:
@@ -16,36 +16,18 @@ def main():
 
     # check for config file
     # create if none
-    config = helper.load_app_config(APPNAME)
-    if not config:
-        config = {
-                "streamcatcher_id":False,
-                "reward_id":False,
-                "reward_amount":False,
-                "stream_folder": ".streamcatcher"
-                }
-        fn = helper.create_app_config(APPNAME,config)
-        print("Config file created:",fn)
-        print("Please fill it out carefully and run this app again")
-        exit()
-
-
+    config_template = {
+        "streamcatcher_id":False,
+        "reward_id":False,
+        "reward_amount":False,
+        "stream_folder": ".streamcatcher"
+    }
+    config = helper.load_or_create_app_config(APPNAME,config_template)
 
     if len(sys.argv) == 2:
     
-        # confirm config
-        print("Please confirm that config is correct:")
-        print("-------")
-        for k,v in config.items():
-            print(k,":",v)
-
-        print("-------")
-        print("Pausing for 10 seconds")
-        time.sleep(10)
-
         # ok now we are in business
-        community_name = config["community"]
-        collection = Collection(config["community"],config["collection"])
+        collection = Collection(config["community_name"],config["collection_id"])
         
         if sys.argv[1] == "on":
             stname = datetime.datetime.now().isoformat().replace(":","_").replace(".","_")
