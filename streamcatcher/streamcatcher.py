@@ -7,9 +7,10 @@ import datetime
 import time
 #import glx.app.arghandler
 import argparse
+import glx.apphelper
 
 APPNAME = "streamcatcher"
-__version__ = "0.1"
+__version__ = "0.5"
     
 # app default config
 CONFIG_TEMPLATE = {
@@ -21,44 +22,14 @@ CONFIG_TEMPLATE = {
 }
 
 def main():
-    # TODO
-    #
-    # can be executed with params
-    # or works automatically when called without params
-    # it checks 2 things:
-    # 1. if the first card of the collection has the control attribute
-    # 2. if there is an open stream
-    #
-    # if True  & False: opens streamcatcher
-    # if True  & True:  does nothing
-    # if False & False: does nothing
-    # if False & True:  closes streamcatcher and distributes rewards
-    # 
-    # New version
-    #
-    # streamcatcher on: adds streamcatcher to all cards.
-    # Watches for events.
-    #
-    # steramcatcher off: removes streamcatcher from all cards.
-    #
-    # 1. implement config in community folder
-    # 2. integrate asyncio
+    parser = glx.apphelper.setup_parser(__version__,APPNAME)
 
-    # check for config file
-    # create if none
-
-    # common stuff
-
-    parser = argparse.ArgumentParser()
-    parser.add_argument("-v", "--version", action="store_true")
-    parser.add_argument("-c", "--community")
+    # this app's specific arguments
     parser.add_argument("--on", action="store_true")
     parser.add_argument("--off", action="store_true")
     args = parser.parse_args()
 
-    if args.version:
-        print(__version__)
-        exit(0)
+    glx.apphelper.process_common_args(args,__version__,APPNAME)
 
     # find community
     if args.community:
@@ -119,6 +90,7 @@ def main():
         print("`streamcatcher --off` -- switches off streamcatcher and processes the results")
 
 def interact(community_name, app_name, card_id, data=None):
+    print("Streamcatcher interact start!")
     config = helper.load_app_config(community_name,APPNAME)
     collection = Collection(community_name,config["collection_id"])
     card = collection.card(card_id)
