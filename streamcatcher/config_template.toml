@@ -1,0 +1,16 @@
+streamcatcher_id  = "SETUP"                # streamcatcher badge
+reward_id         = "SETUP"                # where to deposit the reward
+reward_amount     = 1
+name              = "streamcatcher"
+collection_id     = 1
+type              = "button"               # "button" or "mcq" (multiple choice question)
+choices           = ["one","two","three"]
+winner            = "two"                  # the winner selection (must be present in choices)
+
+[[interactions]]
+name              = "sc_click"
+event             = "CardAttributeInteracted"
+collection_id     = 1
+attribute_id      = "!streamcatcher_id"
+module            = "streamcatcher.streamcatcher"
+function          = "interact()"

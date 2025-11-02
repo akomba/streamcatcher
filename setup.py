@@ -46,7 +46,7 @@ setup(
     keywords=[],
     scripts=[],
     entry_points={"console_scripts": [
-        "streamcatcher=streamcatcher.streamcatcher:main"
+        "streamcatcher=streamcatcher.streamcatcher:cli"
         ]},
     data_files=[("share/man/man6", ["man/streamcatcher.6"])],
     zip_safe=False,
