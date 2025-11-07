@@ -10,7 +10,7 @@ import argparse
 import glx.apphelper
 
 APPNAME = "streamcatcher"
-__version__ = "0.7"
+__version__ = "0.7.1"
 CONFIG_TEMPLATE = "config_template.toml"
 
 def cli():
@@ -104,15 +104,36 @@ def cli():
         print("`streamcatcher --on` -- switches on streamcatcher")
         print("`streamcatcher --off` -- switches off streamcatcher and processes the results")
 
+def give_reward(card_id,community_name):
+    config = helper.load_app_config(community_name,APPNAME)
+    collection = Collection(community_name,config["collection_id"])
+    card = collection.card(card_id)
+    card.increase_attribute_value(config["reward_id"],config["reward_amount"]) # deploy reward
+    print("Streamcatcher click on card "+str(card_id)+" detected, added +"+str(config["reward_amount"])+" to reward attribute ("+str(config["reward_id"])+")")
+
 def interact(community_name, app_name, card_id, data=None):
     print("Streamcatcher interact start!")
     print("data:",data)
     # {'interacted_value': 'dragons'} 
-    if data and "interacted_value" in data and data["interacted_value"] == "dragons":
-        config = helper.load_app_config(community_name,APPNAME)
-        collection = Collection(community_name,config["collection_id"])
-        card = collection.card(card_id)
-        card.increase_attribute_value(config["reward_id"],config["reward_amount"]) # deploy reward
-        print("Streamcatcher click on card "+str(card_id)+" detected, added +"+str(config["reward_amount"])+" to reward attribute ("+str(config["reward_id"])+")")
+    # find open stream
+    open_stream,stname = helper.load_latest_app_data(community_name,APPNAME)
+    print("open stream:",open_stream)
+    if open_stream["status"] != "deployed":
+        print("Can't find open stream, exiting.")
+        return
+    # if mcq, read solution
+    # otherwise just award
+    if open_stream["interactive_config"]["type"] == "single_button":
+        print("button")
+        give_reward(card_id,community_name)
+    elif open_stream["interactive_config"]["type"] == "multiple_choice":
+        print("streamcatcher mcq")
+        if data and "interacted_value" in data:
+            print("interacted_value:",data["interacted_value"])
+            print("solution:", open_stream["interactive_config"]["solution"])
+            if data["interacted_value"] == open_stream["interactive_config"]["solution"]:
+                give_reward(card_id,community_name)
+    else:
+        print("something is wrong")
     print("--------")
     #card.remove_attribute(config["streamcatcher_id"])
